@@ -1,0 +1,35 @@
+---
+import { getAllBlogs } from "../../lib/blogs";
+import Layout from "../layouts/Layout.astro";
+import  MarkdownRenderer from "../../components/MarkdownRenderer.svelte";
+const blogs = await getAllBlogs();
+if (!blogs) {
+  return new Response(null, {
+    status: 404,
+    statusText: "Not found",
+  });
+}
+
+const markdownContent = `
+# Hello World
+
+This is a sample markdown content.
+`;
+---
+
+<Layout>
+  <h1>blogs</h1>
+  <ul>
+    {
+      blogs.map((blog) => (
+        <li>
+      {/* <p>{blog.content}</p> */}
+
+      <MarkdownRenderer content={blog} />
+        </li>
+      ))
+    }
+  </ul>
+
+
+</Layout>

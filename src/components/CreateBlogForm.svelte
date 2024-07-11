@@ -1,0 +1,230 @@
+<script>
+  let title = "";
+  let content = "";
+  let subtitle = "";
+  let contextMenuVisible = false;
+  let contextMenuX = 0;
+  let contextMenuY = 0;
+
+  async function handleSubmit() {
+    try {
+      await fetch("/api/blogs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, content, subtitle }),
+      });
+      window.location.replace("/blogs");
+    } catch (error) {
+      alert("Oops. We failed.");
+    }
+  }
+
+  const applyFormatting = (command, value = null) => {
+    if (typeof document !== 'undefined') {
+      document.execCommand(command, false, value);
+      getTextContent();
+    }
+  };
+
+  const getTextContent = () => {
+    const editor = document.getElementById("editor");
+    content = editor.innerHTML;
+  };
+
+  const insertLink = () => {
+    const url = prompt("Enter the URL");
+    if (url) {
+      applyFormatting("createLink", url);
+    }
+    hideContextMenu();
+  };
+
+  const insertImgLink = () => {
+    const url = prompt("Enter the URL");
+    if (url) {
+      const imgTag = `<img src="${url}" style="height:auto; width:auto;" />`;
+      applyFormatting("insertHTML", imgTag);
+    }
+  };
+
+  const insertTable = () => {
+    const rows = parseInt(prompt("Enter the number of rows"), 10);
+    const cols = parseInt(prompt("Enter the number of columns"), 10);
+    if (rows && cols) {
+      let table = "";
+      table += "<table border='1'>";
+      for (let i = 0; i < rows; i++) {
+        table += "<tr>";
+        for (let j = 0; j < cols; j++) {
+          table += "<td>Cell</td>";
+        }
+        table += "</tr>";
+      }
+      table += "</table>";
+      applyFormatting("insertHTML", table);
+    }
+  };
+
+  const showContextMenu = (event) => {
+    event.preventDefault();
+    contextMenuX = event.pageX;
+    contextMenuY = event.pageY;
+    contextMenuVisible = true;
+  };
+
+  const hideContextMenu = () => {
+    contextMenuVisible = false;
+  };
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('click', hideContextMenu);
+  }
+</script>
+
+<form on:submit|preventDefault={handleSubmit}>
+  <div class="form-content">
+    <label>
+      Title:
+      <input type="text" bind:value={title} required />
+    </label>
+
+    <label>
+      Sub Title:
+      <input type="text" bind:value={subtitle} required />
+    </label>
+
+    <div class="content-box">
+      <label for="">
+        Content:
+
+      </label>
+
+      <div>
+        <div class="toolbar">
+            <button type="button" on:click={() => applyFormatting("bold")}><i class="fas fa-bold"></i></button>
+            <button type="button" on:click={() => applyFormatting("italic")}><i class="fas fa-italic"></i></button>
+            <button type="button" on:click={() => applyFormatting("strikeThrough")}><i class="fas fa-strikethrough"></i></button>
+            <button type="button" on:click={() => applyFormatting("insertText", "``")}><i class="fas fa-code"></i></button>
+            <button type="button" on:click={() => applyFormatting("insertUnorderedList")}><i class="fas fa-list-ul"></i></button>
+          
+            <button type="button" on:click={() => applyFormatting("insertOrderedList")}><i class="fas fa-list-ol"></i></button>
+            <button type="button" on:click={insertTable}><i class="fas fa-table"></i></button>
+            <button type="button" on:click={insertImgLink}><i class="fas fa-image"></i></button>
+        </div>
+        <div
+          id="editor"
+          contenteditable="true"
+          on:input={getTextContent}
+          on:contextmenu={showContextMenu}
+          required
+        ></div>
+      </div>
+     
+    
+    </div>
+
+    <button type="submit" class="submit">Submit</button>
+  </div>
+
+  {#if contextMenuVisible}
+    <div
+      class="context-menu"
+      style="top: {contextMenuX}px; left: {contextMenuY}px;"
+    >
+      <button type="button" on:click={insertLink}>Insert Link</button>
+    </div>
+  {/if}
+</form>
+
+<style>
+  #editor {
+    height: 200px;
+    width: 80%;
+    border: 1px solid black;
+    padding: 10px;
+    overflow-y: scroll;
+    margin: 5px;
+  }
+
+  input {
+    padding: 5px;
+    width: 200px;
+    outline: none;
+  }
+
+  form {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .content-box {
+    display: flex;
+    justify-content: center;
+  }
+
+  .form-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid black;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  label {
+    margin: 10px 0;
+  }
+
+  .toolbar {
+    margin-bottom: 10px;
+    width: 15%;
+    margin-left: 20px;
+    display: flex;
+  }
+
+  button {
+    margin-right: 5px;
+    margin-top: 10px;
+    padding: 8px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button i {
+    font-size: 20px;
+  }
+
+  .submit {
+    width: 200px;
+  }
+
+  .context-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .context-menu button {
+    margin-bottom: 5px;
+  }
+
+  .resized-img {
+    width: 300px;
+    height: 300px;
+  }
+</style>
