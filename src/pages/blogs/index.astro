@@ -9,12 +9,6 @@ if (!blogs) {
     statusText: "Not found",
   });
 }
-
-const markdownContent = `
-# Hello World
-
-This is a sample markdown content.
-`;
 ---
 
 <Layout>
@@ -33,3 +27,20 @@ This is a sample markdown content.
 
 
 </Layout>
+
+<style>
+  h1{
+    text-align: center;
+  }
+
+  ul{
+    
+    list-style-type: none;
+  }
+
+  li{
+    align-items: center;
+display: flex;
+flex-direction: column;
+  }
+</style>

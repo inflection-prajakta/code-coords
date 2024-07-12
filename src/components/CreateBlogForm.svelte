@@ -87,7 +87,7 @@
   <div class="form-content">
     <label>
       Title:
-      <input type="text" bind:value={title} required />
+      <input type="text" class="title" bind:value={title} required />
     </label>
 
     <label>
@@ -95,13 +95,13 @@
       <input type="text" bind:value={subtitle} required />
     </label>
 
-    <div class="content-box">
+    <div class="content-container">
       <label for="">
         Content:
 
       </label>
 
-      <div>
+      <div class="content-options">
         <div class="toolbar">
             <button type="button" on:click={() => applyFormatting("bold")}><i class="fas fa-bold"></i></button>
             <button type="button" on:click={() => applyFormatting("italic")}><i class="fas fa-italic"></i></button>
@@ -120,12 +120,12 @@
           on:contextmenu={showContextMenu}
           required
         ></div>
-      </div>
-     
-    
+      </div>    
     </div>
 
-    <button type="submit" class="submit">Submit</button>
+    <div class="submitBtn">
+      <button type="submit" class="submit">Submit</button>
+   </div>
   </div>
 
   {#if contextMenuVisible}
@@ -133,19 +133,24 @@
       class="context-menu"
       style="top: {contextMenuX}px; left: {contextMenuY}px;"
     >
+
+
       <button type="button" on:click={insertLink}>Insert Link</button>
     </div>
   {/if}
 </form>
 
 <style>
+.title{
+  margin-left: 33px;
+}
+
   #editor {
     height: 200px;
-    width: 80%;
+    width: 400px;
     border: 1px solid black;
     padding: 10px;
     overflow-y: scroll;
-    margin: 5px;
   }
 
   input {
@@ -160,7 +165,7 @@
     padding: 20px;
   }
 
-  .content-box {
+  .content-container {
     display: flex;
     justify-content: center;
   }
@@ -168,44 +173,56 @@
   .form-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    border: 1px solid black;
+    align-items: start;
+ 
     padding: 20px;
-    border-radius: 10px;
   }
 
   label {
     margin: 10px 0;
+    font-weight: bold;
+    font-size: large;
   }
 
   .toolbar {
-    margin-bottom: 10px;
     width: 15%;
     margin-left: 20px;
     display: flex;
   }
 
   button {
-    margin-right: 5px;
+   background-color: transparent;
+   border: none;
+   margin-right: 5px;
     margin-top: 10px;
     padding: 8px;
     width: 50px;
     height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
     cursor: pointer;
+    margin-bottom: 0px;
+
   }
 
   button i {
     font-size: 20px;
   }
 
-  .submit {
-    width: 200px;
+  .submitBtn {
+   text-align: center;
+   width: 45%;
+  }
+   .submit:hover{
+    box-shadow: 2px 2px 5px grey;
+   }
+  
+
+  .submit{
+    text-align: center;
+    width: 100px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    
+
   }
 
   .context-menu {
