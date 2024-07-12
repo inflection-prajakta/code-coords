@@ -1,13 +1,16 @@
 <script>
   import { onMount } from 'svelte';
   import { marked } from 'marked';
+  import {Remarkable} from 'remarkable'
+
+  const md = new Remarkable()
 
   export let content = '';
 
   let htmlTitle = '';
   let htmlContent = '';
     htmlTitle = marked(content.markdownTitle)
-    htmlContent = marked(content.content);
+    htmlContent = md.render(content.content);
     // console.log('HTML content:', htmlContent);  
 </script>
 

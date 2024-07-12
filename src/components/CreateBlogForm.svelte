@@ -23,14 +23,44 @@
 
   const applyFormatting = (command, value = null) => {
     if (typeof document !== 'undefined') {
-      document.execCommand(command, false, value);
-      getTextContent();
+        const selection = window.getSelection();
+        
+        if (command === "insertText" && value === "~~") {
+            // Handle strikethrough
+            const range = selection.getRangeAt(0);
+            const selectedText = selection.toString();
+            const strikethroughElement = document.createElement("s");
+            strikethroughElement.textContent = selectedText;
+
+            range.deleteContents();
+            range.insertNode(strikethroughElement);
+        } else if (command === "insertText" && value === "*") {
+            // Handle italic using *
+            const range = selection.getRangeAt(0);
+            const italicElement = document.createElement("em");
+            italicElement.textContent = selection.toString();
+
+            range.deleteContents();
+            range.insertNode(italicElement);
+        } else if (command === "insertText" && value === "``") {
+            // Handle code formatting
+            const range = selection.getRangeAt(0);
+            const span = document.createElement("code");
+            span.textContent = selection.toString();
+            range.deleteContents();
+            range.insertNode(span);
+        }else {
+            // Use execCommand for other commands (like lists)
+            document.execCommand(command, false, value);
+        }
+        getTextContent();
     }
-  };
+};
+
 
   const getTextContent = () => {
     const editor = document.getElementById("editor");
-    content = editor.innerHTML;
+    content = editor.innerHTML 
   };
 
   const insertLink = () => {
@@ -49,23 +79,23 @@
     }
   };
 
-  const insertTable = () => {
-    const rows = parseInt(prompt("Enter the number of rows"), 10);
-    const cols = parseInt(prompt("Enter the number of columns"), 10);
-    if (rows && cols) {
-      let table = "";
-      table += "<table border='1'>";
-      for (let i = 0; i < rows; i++) {
-        table += "<tr>";
-        for (let j = 0; j < cols; j++) {
-          table += "<td>Cell</td>";
-        }
-        table += "</tr>";
+ const insertTable = () => {
+  const rows = parseInt(prompt("Enter the number of rows"), 10);
+  const cols = parseInt(prompt("Enter the number of columns"), 10);
+  if (Number.isInteger(rows) && Number.isInteger(cols) && rows > 0 && cols > 0) {
+    let table = "<table border='1'>";
+    for (let i = 0; i < rows; i++) {
+      table += "<tr>";
+      for (let j = 0; j < cols; j++) {
+        table += "<td>Cell</td>";
       }
-      table += "</table>";
-      applyFormatting("insertHTML", table);
+      table += "</tr>";
     }
-  };
+    table += "</table>";
+    applyFormatting("insertHTML", table);
+  }
+};
+
 
   const showContextMenu = (event) => {
     event.preventDefault();
@@ -104,14 +134,15 @@
       <div class="content-options">
         <div class="toolbar">
             <button type="button" on:click={() => applyFormatting("bold")}><i class="fas fa-bold"></i></button>
-            <button type="button" on:click={() => applyFormatting("italic")}><i class="fas fa-italic"></i></button>
-            <button type="button" on:click={() => applyFormatting("strikeThrough")}><i class="fas fa-strikethrough"></i></button>
+            <button type="button" on:click={() => applyFormatting("insertText", "*")}><i class="fas fa-italic"></i></button>
+            <button type="button" on:click={() => applyFormatting("insertText", "~~")}><i class="fas fa-strikethrough"></i></button>
             <button type="button" on:click={() => applyFormatting("insertText", "``")}><i class="fas fa-code"></i></button>
             <button type="button" on:click={() => applyFormatting("insertUnorderedList")}><i class="fas fa-list-ul"></i></button>
           
             <button type="button" on:click={() => applyFormatting("insertOrderedList")}><i class="fas fa-list-ol"></i></button>
             <button type="button" on:click={insertTable}><i class="fas fa-table"></i></button>
             <button type="button" on:click={insertImgLink}><i class="fas fa-image"></i></button>
+        
         </div>
         <div
           id="editor"
