@@ -1,7 +1,7 @@
 ---
 import { getAllBlogs } from "../../lib/blogs";
 import Layout from "../layouts/Layout.astro";
-import  MarkdownRenderer from "../../components/MarkdownRenderer.svelte";
+import MarkdownRenderer from "../../components/MarkdownRenderer.svelte";
 const blogs = await getAllBlogs();
 if (!blogs) {
   return new Response(null, {
@@ -12,35 +12,15 @@ if (!blogs) {
 ---
 
 <Layout>
-  <h1>blogs</h1>
   <ul>
     {
       blogs.map((blog) => (
         <li>
-      {/* <p>{blog.content}</p> */}
+          {/* <p>{blog.content}</p> */}
 
-      <MarkdownRenderer content={blog} />
+          <MarkdownRenderer content={blog} />
         </li>
       ))
     }
   </ul>
-
-
 </Layout>
-
-<style>
-  h1{
-    text-align: center;
-  }
-
-  ul{
-    
-    list-style-type: none;
-  }
-
-  li{
-    align-items: center;
-display: flex;
-flex-direction: column;
-  }
-</style>

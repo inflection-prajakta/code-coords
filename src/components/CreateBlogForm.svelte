@@ -24,44 +24,36 @@
   const applyFormatting = (command, value = null) => {
     console.log(`Command: ${command}, Value: ${value}`);
     if (typeof document !== 'undefined') {
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            if (command === "insertText" && value === "~~") {
-                const selectedText = selection.toString();
-                const strikethroughElement = document.createElement("s");
-                strikethroughElement.textContent = selectedText;
-                range.deleteContents();
-                range.insertNode(strikethroughElement);
-            } else if (command === "insertText" && value === "*") {
-                const italicElement = document.createElement("em");
-                italicElement.textContent = selection.toString();
-                range.deleteContents();
-                range.insertNode(italicElement);
-            } else if (command === "insertText" && value === "``") {
-                const span = document.createElement("code");
-                span.textContent = selection.toString();
-                range.deleteContents();
-                range.insertNode(span);
-            } else {
-                // Use execCommand for other commands (like lists)
-                if (document.queryCommandSupported(command)) {
-                    document.execCommand(command, false, value);
-                } else {
-                    console.warn(`Command ${command} is not supported.`);
-                }
-            }
-            getTextContent();
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        if (command === "insertText" && value === "*") {
+          const italicElement = document.createElement("em");
+          italicElement.textContent = selection.toString();
+          range.deleteContents();
+          range.insertNode(italicElement);
+        } else if (command === "insertText" && value === "``") {
+          const span = document.createElement("code");
+          span.textContent = selection.toString();
+          range.deleteContents();
+          range.insertNode(span);
+        } else {
+          // Use execCommand for other commands (like lists)
+          if (document.queryCommandSupported(command)) {
+            document.execCommand(command, false, value);
+          } else {
+            console.warn(`Command ${command} is not supported.`);
+          }
         }
+        getTextContent();
+      }
     }
-};
+  };
 
-const getTextContent = () => {
+  const getTextContent = () => {
     const editor = document.getElementById("editor");
     content = editor.innerHTML;
-    console.log(`Content: ${content}`);
-};
-
+  };
 
   const insertLink = () => {
     const url = prompt("Enter the URL");
@@ -79,16 +71,29 @@ const getTextContent = () => {
     }
   };
 
+  const insertChecklistItem = () => {
+    const range = window.getSelection().getRangeAt(0);
+    const checklistItem = document.createElement("div");
+    checklistItem.innerHTML = `<input type="checkbox" /> <span contenteditable="true">Checklist Item</span>`;
+
+    range.deleteContents();
+    range.insertNode(checklistItem);
+    range.setStartAfter(checklistItem);
+    range.collapse(true);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  };
+
   const insertTable = () => {
     const rows = parseInt(prompt("Enter the number of rows"), 10);
     const cols = parseInt(prompt("Enter the number of columns"), 10);
     if (rows && cols) {
-      let table = "";
-      table += "<table border='1'>";
+      let table = "<table class='min-w-full border border-gray-300 border-collapse'>";
       for (let i = 0; i < rows; i++) {
-        table += "<tr>";
+        table += "<tr class='border-b border-gray-300'>";
         for (let j = 0; j < cols; j++) {
-          table += "<td>Cell</td>";
+          table += "<td class='px-4 py-2 text-left'>Cell</td>";
         }
         table += "</tr>";
       }
@@ -113,152 +118,70 @@ const getTextContent = () => {
   }
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
-  <div class="form-content">
-    <label >
-      Title:
-      <input type="text" class=" mx-10 border rounded-md border-black" bind:value={title} required />
-    </label>
-
-    <label>
-      Sub Title:
-      <input type="text" class=" mx-1 border rounded-md border-black" bind:value={subtitle} required />
-    </label>
-
-    <div class="content-container">
-      <label for="">
-        Content:
-
+<form on:submit|preventDefault={handleSubmit} class="max-w-4xl mx-auto mt-8">
+  <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <div class="mb-4">
+      <label class="block text-black text-lg font-semibold mb-2">
+        Title
+        <input type="text" class="form-input mt-1 block w-full rounded-md border-gray-300" bind:value={title} required />
       </label>
+    </div>
 
-      <div class="content-options">
-        <div class="toolbar">
-            <button type="button" on:click={() => applyFormatting("bold")}><i class="fas fa-bold"></i></button>
-            <button type="button" on:click={() => applyFormatting("italic")}><i class="fas fa-italic"></i></button>
-            <button type="button" on:click={() => applyFormatting("strikeThrough")}><i class="fas fa-strikethrough"></i></button>
-            <button type="button" on:click={() => applyFormatting("insertText", "``")}><i class="fas fa-code"></i></button>
-            <button type="button" on:click={() => applyFormatting("insertUnorderedList")}><i class="fas fa-list-ul"></i></button>
-            <button type="button" on:click={() => applyFormatting("insertOrderedList")}><i class="fas fa-list-ol"></i></button>
-             <button type="button" on:click={insertTable}><i class="fas fa-table"></i></button>
-            <button type="button" on:click={insertImgLink}><i class="fas fa-image"></i></button>
-        </div>
+    <div class="mb-4">
+      <label class="block text-black text-lg font-semibold mb-2">
+        Sub Title
+        <input type="text" class="form-input mt-1 block w-full rounded-md border-gray-300" bind:value={subtitle} required />
+      </label>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-black text-lg font-semibold mb-2">
+        Content
+      </label>
+      <div class="border border-gray-300 rounded">
+      <div class="flex justify-end p-2">
+  <button type="button" class="text-gray-600 p-2 rounded-lg border mx-1 hover:bg-gray-200 focus:outline-none" on:click={() => applyFormatting("bold")}>
+    <i class="fas fa-bold"></i>
+  </button>
+  <button type="button" class="text-gray-600 p-2 rounded-lg border mx-1 hover:bg-gray-200 focus:outline-none" on:click={() => applyFormatting("italic")}>
+    <i class="fas fa-italic"></i>
+  </button>
+  <button type="button" class="text-gray-600 p-2 rounded-lg border mx-1 hover:bg-gray-200 focus:outline-none" on:click={() => applyFormatting("insertText", "``")}>
+    <i class="fas fa-code"></i>
+  </button>
+  <button type="button" class="text-gray-600 p-2 rounded-lg border mx-1 hover:bg-gray-200 focus:outline-none" on:click={() => applyFormatting("insertUnorderedList")}>
+    <i class="fas fa-list-ul"></i>
+  </button>
+  <button type="button" class="text-gray-600 p-2 rounded-lg border mx-1 hover:bg-gray-200 focus:outline-none" on:click={() => applyFormatting("insertOrderedList")}>
+    <i class="fas fa-list-ol"></i>
+  </button>
+  <button type="button" class="text-gray-600 p-2 rounded-lg border mx-1 hover:bg-gray-200 focus:outline-none" on:click={insertTable}>
+    <i class="fas fa-table"></i>
+  </button>
+  <button type="button" class="text-gray-600 p-2 rounded-lg border mx-1 hover:bg-gray-200 focus:outline-none" on:click={insertImgLink}>
+    <i class="fas fa-image"></i>
+  </button>
+</div>
         <div
-         role="presentation"
           id="editor"
           contenteditable="true"
           on:input={getTextContent}
           on:contextmenu={showContextMenu}
+          class="p-4 outline-none prose"
+          style="min-height: 200px;"
           required
-          class="prose prose-sm p-4 border rounded"
         ></div>
-      </div>    
+      </div>
     </div>
 
-    <div class="submitBtn">
-      <button type="submit" class="submit">Submit</button>
-   </div>
+    <div class="flex items-center justify-end">
+      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Submit</button>
+    </div>
   </div>
 
   {#if contextMenuVisible}
-    <div
-      class="context-menu"
-      style="top: {contextMenuX}px; left: {contextMenuY}px;"
-    >
-
-
-      <button type="button" on:click={insertLink}>Insert Link</button>
+    <div class="fixed bg-white shadow-md rounded p-2" style="top: {contextMenuY}px; left: {contextMenuX}px;">
+      <button type="button" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200" on:click={insertLink}>Insert Link</button>
     </div>
   {/if}
 </form>
-
-<style>
-
-  input {
-    padding: 5px;
-    width: 200px;
-    outline: none;
-  }
-
-  form {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-  }
-
-  .content-container {
-    display: flex;
-    justify-content: center;
-  }
-
-  .form-content {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
- 
-    padding: 20px;
-  }
-
-  label {
-    margin: 10px 0;
-    font-weight: bold;
-    font-size: large;
-  }
-
-  .toolbar {
-    width: 15%;
-    margin-left: 20px;
-    display: flex;
-  }
-
-  button {
-   background-color: transparent;
-   border: none;
-   margin-right: 5px;
-    margin-top: 10px;
-    padding: 8px;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    margin-bottom: 0px;
-
-  }
-
-  button i {
-    font-size: 20px;
-  }
-
-  .submitBtn {
-   text-align: center;
-   width: 45%;
-  }
-   .submit:hover{
-    box-shadow: 2px 2px 5px grey;
-   }
-  
-
-  .submit{
-    text-align: center;
-    width: 100px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    
-
-  }
-
-  .context-menu {
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .context-menu button {
-    margin-bottom: 5px;
-  }
-
-
-</style>
