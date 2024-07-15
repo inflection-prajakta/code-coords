@@ -5,6 +5,7 @@
   let contextMenuVisible = false;
   let contextMenuX = 0;
   let contextMenuY = 0;
+  // console.log(content);
 
   async function handleSubmit() {
     try {
@@ -27,13 +28,7 @@
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
-            if (command === "insertText" && value === "~~") {
-                const selectedText = selection.toString();
-                const strikethroughElement = document.createElement("s");
-                strikethroughElement.textContent = selectedText;
-                range.deleteContents();
-                range.insertNode(strikethroughElement);
-            } else if (command === "insertText" && value === "*") {
+            if (command === "insertText" && value === "*") {
                 const italicElement = document.createElement("em");
                 italicElement.textContent = selection.toString();
                 range.deleteContents();
@@ -59,7 +54,7 @@
 const getTextContent = () => {
     const editor = document.getElementById("editor");
     content = editor.innerHTML;
-    console.log(`Content: ${content}`);
+    // console.log(content);
 };
 
 
@@ -79,23 +74,38 @@ const getTextContent = () => {
     }
   };
 
-  const insertTable = () => {
-    const rows = parseInt(prompt("Enter the number of rows"), 10);
-    const cols = parseInt(prompt("Enter the number of columns"), 10);
-    if (rows && cols) {
-      let table = "";
-      table += "<table border='1'>";
-      for (let i = 0; i < rows; i++) {
-        table += "<tr>";
-        for (let j = 0; j < cols; j++) {
-          table += "<td>Cell</td>";
-        }
-        table += "</tr>";
+  const insertChecklistItem = () => {
+    const range = window.getSelection().getRangeAt(0);
+    const checklistItem = document.createElement("div");
+    checklistItem.innerHTML = `<input type="checkbox" /> <span contenteditable="true">Checklist Item</span>`;
+    
+    range.deleteContents();
+    range.insertNode(checklistItem);
+    range.setStartAfter(checklistItem);
+    range.collapse(true);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+};
+
+
+const insertTable = () => {
+  const rows = parseInt(prompt("Enter the number of rows"), 10);
+  const cols = parseInt(prompt("Enter the number of columns"), 10);
+  if (rows && cols) {
+    let table = "<table class='min-w-full border border-gray-300 border-collapse'>"; 
+    for (let i = 0; i < rows; i++) {
+      table += "<tr class='border-b border-gray-300'>"; 
+      for (let j = 0; j < cols; j++) {
+        table += "<td class='px-4 py-2 text-left'>Cell</td>"; 
       }
-      table += "</table>";
-      applyFormatting("insertHTML", table);
+      table += "</tr>";
     }
-  };
+    table += "</table>";
+    applyFormatting("insertHTML", table);
+  }
+};
+
 
   const showContextMenu = (event) => {
     event.preventDefault();
@@ -135,12 +145,12 @@ const getTextContent = () => {
         <div class="toolbar">
             <button type="button" on:click={() => applyFormatting("bold")}><i class="fas fa-bold"></i></button>
             <button type="button" on:click={() => applyFormatting("italic")}><i class="fas fa-italic"></i></button>
-            <button type="button" on:click={() => applyFormatting("strikeThrough")}><i class="fas fa-strikethrough"></i></button>
             <button type="button" on:click={() => applyFormatting("insertText", "``")}><i class="fas fa-code"></i></button>
             <button type="button" on:click={() => applyFormatting("insertUnorderedList")}><i class="fas fa-list-ul"></i></button>
             <button type="button" on:click={() => applyFormatting("insertOrderedList")}><i class="fas fa-list-ol"></i></button>
              <button type="button" on:click={insertTable}><i class="fas fa-table"></i></button>
             <button type="button" on:click={insertImgLink}><i class="fas fa-image"></i></button>
+
         </div>
         <div
          role="presentation"
