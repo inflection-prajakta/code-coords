@@ -63,8 +63,6 @@ const getTextContent = () => {
 };
 
 
-
-
   const insertLink = () => {
     const url = prompt("Enter the URL");
     if (url) {

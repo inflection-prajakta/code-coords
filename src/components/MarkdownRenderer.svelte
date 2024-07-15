@@ -4,7 +4,7 @@
 
 
   export let content = '';
-
+//  console.log(content.content);
   let htmlTitle = '';
   let htmlContent = '';
     htmlTitle = marked(content.markdownTitle)
@@ -12,14 +12,14 @@
     // console.log('HTML content:', htmlContent);  
 </script>
 
-<div class="markdown" >
+<div class="markdown prose prose-sm mx-auto p-4 bg-gray-200 rounded-lg w-1/2" >
   {@html htmlTitle}
 
   {@html htmlContent}
 
 </div>
 
-<style>
+<!-- <style>
   .markdown {
     font-family: Arial, sans-serif;
     list-style-type: none;
@@ -30,4 +30,4 @@
     width: 70%;
   }
 
-</style>
+</style> -->
