@@ -10,18 +10,21 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^1.1.5",
+    "autoprefixer": "^10.4.19",
     "markdown-it": "^14.1.0",
     "marked": "^13.0.2",
     "mdsvex": "^0.11.2",
-    "mongodb": "^4.9.1",
+    "mongodb": "^6.8.0",
+    "postcss": "^8.4.39",
     "remarkable": "^2.0.1",
     "turndown": "^7.2.0"
   },
   "devDependencies": {
-    "@astrojs/node": "^1.0.1",
-    "@astrojs/svelte": "^1.0.2",
-    "svelte": "^3.50.0",
+    "@astrojs/node": "^8.3.2",
+    "@astrojs/svelte": "^5.6.0",
+    "@astrojs/tailwind": "^5.1.0",
+    "astro": "^4.11.5",
+    "svelte": "^4.2.18",
     "tailwindcss": "^3.4.4"
   }
 }

@@ -1,10 +1,12 @@
-import { defineConfig } from "astro/config";
-import node from "@astrojs/node";
-import svelte from "@astrojs/svelte";
+import { defineConfig } from 'astro/config';
+import svelte from '@astrojs/svelte';
+import tailwind from '@astrojs/tailwind';
+import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
   output: "server",
-  adapter: node(),
-  integrations: [svelte()],
+  integrations: [svelte(), tailwind(), node({
+    mode: 'standalone' // or 'server', depending on your use case
+  })]
 });

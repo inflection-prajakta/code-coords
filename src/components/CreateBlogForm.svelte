@@ -22,46 +22,48 @@
   }
 
   const applyFormatting = (command, value = null) => {
+    console.log(`Command: ${command}, Value: ${value}`);
     if (typeof document !== 'undefined') {
         const selection = window.getSelection();
-        
-        if (command === "insertText" && value === "~~") {
-            // Handle strikethrough
+        if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
-            const selectedText = selection.toString();
-            const strikethroughElement = document.createElement("s");
-            strikethroughElement.textContent = selectedText;
-
-            range.deleteContents();
-            range.insertNode(strikethroughElement);
-        } else if (command === "insertText" && value === "*") {
-            // Handle italic using *
-            const range = selection.getRangeAt(0);
-            const italicElement = document.createElement("em");
-            italicElement.textContent = selection.toString();
-
-            range.deleteContents();
-            range.insertNode(italicElement);
-        } else if (command === "insertText" && value === "``") {
-            // Handle code formatting
-            const range = selection.getRangeAt(0);
-            const span = document.createElement("code");
-            span.textContent = selection.toString();
-            range.deleteContents();
-            range.insertNode(span);
-        }else {
-            // Use execCommand for other commands (like lists)
-            document.execCommand(command, false, value);
+            if (command === "insertText" && value === "~~") {
+                const selectedText = selection.toString();
+                const strikethroughElement = document.createElement("s");
+                strikethroughElement.textContent = selectedText;
+                range.deleteContents();
+                range.insertNode(strikethroughElement);
+            } else if (command === "insertText" && value === "*") {
+                const italicElement = document.createElement("em");
+                italicElement.textContent = selection.toString();
+                range.deleteContents();
+                range.insertNode(italicElement);
+            } else if (command === "insertText" && value === "``") {
+                const span = document.createElement("code");
+                span.textContent = selection.toString();
+                range.deleteContents();
+                range.insertNode(span);
+            } else {
+                // Use execCommand for other commands (like lists)
+                if (document.queryCommandSupported(command)) {
+                    document.execCommand(command, false, value);
+                } else {
+                    console.warn(`Command ${command} is not supported.`);
+                }
+            }
+            getTextContent();
         }
-        getTextContent();
     }
 };
 
-
-  const getTextContent = () => {
+const getTextContent = () => {
     const editor = document.getElementById("editor");
-    content = editor.innerHTML 
-  };
+    content = editor.innerHTML;
+    console.log(`Content: ${content}`);
+};
+
+
+
 
   const insertLink = () => {
     const url = prompt("Enter the URL");
@@ -79,23 +81,23 @@
     }
   };
 
- const insertTable = () => {
-  const rows = parseInt(prompt("Enter the number of rows"), 10);
-  const cols = parseInt(prompt("Enter the number of columns"), 10);
-  if (Number.isInteger(rows) && Number.isInteger(cols) && rows > 0 && cols > 0) {
-    let table = "<table border='1'>";
-    for (let i = 0; i < rows; i++) {
-      table += "<tr>";
-      for (let j = 0; j < cols; j++) {
-        table += "<td>Cell</td>";
+  const insertTable = () => {
+    const rows = parseInt(prompt("Enter the number of rows"), 10);
+    const cols = parseInt(prompt("Enter the number of columns"), 10);
+    if (rows && cols) {
+      let table = "";
+      table += "<table border='1'>";
+      for (let i = 0; i < rows; i++) {
+        table += "<tr>";
+        for (let j = 0; j < cols; j++) {
+          table += "<td>Cell</td>";
+        }
+        table += "</tr>";
       }
-      table += "</tr>";
+      table += "</table>";
+      applyFormatting("insertHTML", table);
     }
-    table += "</table>";
-    applyFormatting("insertHTML", table);
-  }
-};
-
+  };
 
   const showContextMenu = (event) => {
     event.preventDefault();
@@ -115,14 +117,14 @@
 
 <form on:submit|preventDefault={handleSubmit}>
   <div class="form-content">
-    <label>
+    <label >
       Title:
-      <input type="text" class="title" bind:value={title} required />
+      <input type="text" class=" mx-10 border rounded-md border-black" bind:value={title} required />
     </label>
 
     <label>
       Sub Title:
-      <input type="text" bind:value={subtitle} required />
+      <input type="text" class=" mx-1 border rounded-md border-black" bind:value={subtitle} required />
     </label>
 
     <div class="content-container">
@@ -134,22 +136,22 @@
       <div class="content-options">
         <div class="toolbar">
             <button type="button" on:click={() => applyFormatting("bold")}><i class="fas fa-bold"></i></button>
-            <button type="button" on:click={() => applyFormatting("insertText", "*")}><i class="fas fa-italic"></i></button>
-            <button type="button" on:click={() => applyFormatting("insertText", "~~")}><i class="fas fa-strikethrough"></i></button>
+            <button type="button" on:click={() => applyFormatting("italic")}><i class="fas fa-italic"></i></button>
+            <button type="button" on:click={() => applyFormatting("strikeThrough")}><i class="fas fa-strikethrough"></i></button>
             <button type="button" on:click={() => applyFormatting("insertText", "``")}><i class="fas fa-code"></i></button>
             <button type="button" on:click={() => applyFormatting("insertUnorderedList")}><i class="fas fa-list-ul"></i></button>
-          
             <button type="button" on:click={() => applyFormatting("insertOrderedList")}><i class="fas fa-list-ol"></i></button>
-            <button type="button" on:click={insertTable}><i class="fas fa-table"></i></button>
+             <button type="button" on:click={insertTable}><i class="fas fa-table"></i></button>
             <button type="button" on:click={insertImgLink}><i class="fas fa-image"></i></button>
-        
         </div>
         <div
+         role="presentation"
           id="editor"
           contenteditable="true"
           on:input={getTextContent}
           on:contextmenu={showContextMenu}
           required
+          class="prose prose-sm p-4 border rounded"
         ></div>
       </div>    
     </div>
@@ -172,17 +174,6 @@
 </form>
 
 <style>
-.title{
-  margin-left: 33px;
-}
-
-  #editor {
-    height: 200px;
-    width: 400px;
-    border: 1px solid black;
-    padding: 10px;
-    overflow-y: scroll;
-  }
 
   input {
     padding: 5px;
@@ -271,8 +262,5 @@
     margin-bottom: 5px;
   }
 
-  .resized-img {
-    width: 300px;
-    height: 300px;
-  }
+
 </style>
