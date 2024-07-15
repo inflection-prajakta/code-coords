@@ -38,7 +38,13 @@
                 span.textContent = selection.toString();
                 range.deleteContents();
                 range.insertNode(span);
-            } else {
+            } else if (command === "blockquote") {
+              const blockquoteElement = document.createElement("blockquote");
+              blockquoteElement.className = "border-l-4 border-gray-500 pl-4 italic text-gray-600"; 
+              blockquoteElement.textContent = selection.toString();
+              range.deleteContents();
+              range.insertNode(blockquoteElement);}
+               else {
                 // Use execCommand for other commands (like lists)
                 if (document.queryCommandSupported(command)) {
                     document.execCommand(command, false, value);
@@ -74,19 +80,7 @@ const getTextContent = () => {
     }
   };
 
-  const insertChecklistItem = () => {
-    const range = window.getSelection().getRangeAt(0);
-    const checklistItem = document.createElement("div");
-    checklistItem.innerHTML = `<input type="checkbox" /> <span contenteditable="true">Checklist Item</span>`;
-    
-    range.deleteContents();
-    range.insertNode(checklistItem);
-    range.setStartAfter(checklistItem);
-    range.collapse(true);
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-};
+
 
 
 const insertTable = () => {
@@ -150,6 +144,7 @@ const insertTable = () => {
             <button type="button" on:click={() => applyFormatting("insertOrderedList")}><i class="fas fa-list-ol"></i></button>
              <button type="button" on:click={insertTable}><i class="fas fa-table"></i></button>
             <button type="button" on:click={insertImgLink}><i class="fas fa-image"></i></button>
+            <button type="button" on:click={() => applyFormatting("blockquote")}><i class="fas fa-quote-left"></i></button> 
 
         </div>
         <div
