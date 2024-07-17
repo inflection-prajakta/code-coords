@@ -38,6 +38,10 @@ export default {
 				  'ol > li::marker': {
 					color: '#4a5568',
 				  },
+				  img:{
+					width:'stretch',
+					height:'400px'
+				  },
 				  table: {
 					width: '100%',
 					marginTop: '1rem',

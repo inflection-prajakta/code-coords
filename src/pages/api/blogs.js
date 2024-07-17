@@ -1,9 +1,11 @@
+// src/routes/api/blogs.js
 import { createBlogs, getAllBlogs } from "../../lib/blogs";
 import TurndownService from "turndown";
 import { Remarkable } from "remarkable";
 const md = new Remarkable();
 const turndownService = new TurndownService();
 
+// Define custom rule for tables if needed
 turndownService.addRule("table", {
   filter: "table",
   replacement: (content, node) => {
@@ -42,26 +44,19 @@ export const GET = async () => {
   });
 };
 
-function convertToMarkdown(title, subtitle) {
-  let markdownTitle = `# ${title}\n\n## ${subtitle}`;
-  return markdownTitle;
-}
-
-const handleSubmit = async (content) => {
-  const markdownContent = turndownService.turndown(content);
-  console.log("markdownContent:", markdownContent);
-
-  return markdownContent;
-};
-
 export const POST = async ({ request }) => {
   const newBlog = await request.json();
-  const { title, content, subtitle } = newBlog;
+  const { title, content, subtitle, coverImage } = newBlog;
 
-  const markdownContent = await handleSubmit(content);
-  const markdownTitle = convertToMarkdown(title, subtitle);
+  // Convert content to Markdown using turndown
+  const markdownContent = turndownService.turndown(content);
 
-  const blog = await createBlogs({ markdownTitle, content: markdownContent });
+  // Create a Markdown title with cover image
+  let markdownTitle = `# ${title}\n\n## ${subtitle}`;
+  let coverImageMarkdown = `![Cover Image](${coverImage})`;
+
+  const blog = await createBlogs({image:coverImageMarkdown, title: markdownTitle, content: markdownContent });
+
   return new Response(JSON.stringify(blog), {
     status: 200,
   });

@@ -1,10 +1,13 @@
 <script>
+  import CoverImage from "./CoverImage.svelte";
+
   let title = "";
   let content = "";
   let subtitle = "";
   let contextMenuVisible = false;
   let contextMenuX = 0;
   let contextMenuY = 0;
+  let coverImage = "";
 
   async function handleSubmit() {
     try {
@@ -13,7 +16,7 @@
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title, content, subtitle }),
+        body: JSON.stringify({ title, content, subtitle, coverImage }),
       });
       window.location.replace("/blogs");
     } catch (error) {
@@ -107,10 +110,63 @@
   if (typeof document !== "undefined") {
     document.addEventListener("click", hideContextMenu);
   }
+
+  function handleCoverImageChange(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        coverImage = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function removeCoverImage() {
+    coverImage = "";
+  }
 </script>
 
 <form on:submit|preventDefault={handleSubmit} class="max-w-4xl mx-auto mt-8">
   <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <div class="mb-4">
+      {#if !coverImage}
+        <label
+          class="block text-black text-lg font-semibold mb-2 bg-blue-900 p-2 w-36 text-center text-white rounded-md cursor-pointer"
+        >
+          Cover Image
+          <input
+            type="file"
+            accept="image/*"
+            class="hidden"
+            id="coverImageInput"
+            on:change={handleCoverImageChange}
+          />
+        </label>
+      {:else}
+        <div class="flex space-x-2">
+          <label
+            for="coverImageInput"
+            class="block text-black text-lg font-semibold mb-2 bg-blue-900 p-2 w-36 text-center text-white rounded-md cursor-pointer"
+          >
+            Change Image
+          </label>
+          <button
+            type="button"
+            class="bg-red-500 block hover:bg-red-700 text-white font-bold p-2 rounded focus:outline-none focus:shadow-outline"
+            on:click={removeCoverImage}>Remove Image</button
+          >
+        </div>
+        <div class="mt-4">
+          <img
+            src={coverImage}
+            alt="CoverImage"
+            class="rounded shadow-md mb-2 h-48"
+          />
+        </div>
+      {/if}
+    </div>
+
     <div class="mb-4">
       <label class="block text-black text-lg font-semibold mb-2">
         Title
@@ -198,7 +254,7 @@
           >
         </div>
         <div
-        role="presentation"
+          role="presentation"
           id="editor"
           contenteditable="true"
           on:input={getTextContent}
