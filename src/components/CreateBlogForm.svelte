@@ -1,5 +1,4 @@
 <script>
-  import CoverImage from "./CoverImage.svelte";
 
   let title = "";
   let content = "";
